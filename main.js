@@ -133,14 +133,10 @@ class GifRenderer {
 function main() {
     addItems();
 
-    // Enabling submiting via enter key
-    var input = document.getElementById("userInput");
-    input.addEventListener("keyup", function(event) {
-        if (event.keyCode === 13) {
-            event.preventDefault();
-            document.getElementById("submit").click();
-        }
-    });
+    document.getElementById('search').addEventListener('submit', (event) => {
+        event.preventDefault();
+        document.getElementById("submit").click();
+    })
 }
 
 window.addEventListener('load',main);
