@@ -7,6 +7,7 @@
     padding-top: 30px;
     padding-bottom: 30px;
     text-align: center;
+    align-items: center;
 }
 
 #submit {
@@ -57,6 +58,12 @@
     background-color: rgb(238, 228, 210);
     cursor: pointer;
     padding: 0 10px;
+}
+
+#result-gifs {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
 }
 
 .gif {
