@@ -17,9 +17,11 @@ function addItems() {
     })
 }
 
-function startSearch() {
+async function startSearch() {
     var param;
     var input = document.getElementById("userInput").value;
+    
+   
     // Checking which button is clicked 
 
     // Clicked from search history
@@ -29,9 +31,8 @@ function startSearch() {
             api_key: 'LZUsjE9N2zpPI5QnY6gIBJEFpZ2opbUa',
             limit: 20
         };
-
         // Call function to send request
-        getGifs(param);
+        await DataService.getGifs(param);        
     }
 
     // Clicked from search
@@ -45,13 +46,14 @@ function startSearch() {
 
         // Updating search history
 
+        if(!items.includes(input)){
             items.push(input);
             items.shift();
             addItems();
-        
+        } 
         
         // Call function to send request
-        getGifs(param);
+        await DataService.getGifs(param);
     }
     
     // Clicked from trends
@@ -62,24 +64,38 @@ function startSearch() {
         };
         
         // Call function to send request
-        getTrends(param);
+        await DataService.getTrends(param);
     }
 }
 
-async function getGifs(param){
-    const response = await fetch("https://api.giphy.com/v1/gifs/search?" + new URLSearchParams(param));
-    const gifs = await response.json();
-    display(gifs.data);
-}
+// Class to fetch data
+class DataService {
+    static async getGifs(param) {
+        try {
+            const response = await fetch("https://api.giphy.com/v1/gifs/search?" + new URLSearchParams(param));
+            const gifs = await response.json();
+            display(gifs.data);
+        } catch (e) {
+            console.log(e);
+            return [];
+        }
+    }
 
-async function getTrends(param) {
-    const response = await fetch("https://api.giphy.com/v1/gifs/trending?" + new URLSearchParams(param));
-    const gifs = await response.json();
-    display(gifs.data);
+    static async getTrends(param) {
+        try {
+            const response = await fetch("https://api.giphy.com/v1/gifs/trending?" + new URLSearchParams(param));
+            const gifs = await response.json();
+            display(gifs.data);
+        } catch (e) {
+            console.log(e);
+            return [];
+        }
+    }
+
 }
 
 function display(gifs){
-    const gifRoot=document.querySelector('#result-gifs');
+    const gifRoot=document.querySelector('.result-gifs');
     const renderer = new GifRenderer(gifRoot);
     renderer.gifRenderer(gifs);
 }
@@ -93,7 +109,7 @@ class GifRenderer {
     gifRenderer(gifs) {
         this.root.innerHTML='';
         if(gifs){
-            for (let index = 0; index < 20; index++) {
+            for (let index = 0; index < gifs.length; index++) {
                 this.root.innerHTML += this._gifToHTML(gifs[index]);            
             }
         }
@@ -104,11 +120,11 @@ class GifRenderer {
             gifhtml += `
                 <div class="gif">
                 <img src="${gif.images.downsized.url}" alt="">
-                <h3>${gif.title}</h3>
+                <h4>${gif.title}</h4>
                 </div>
             `;
        
-        return `<div id="result-gifs">${gifhtml}</div>`;
+        return `${gifhtml}`;
     }
 
 }
