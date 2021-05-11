@@ -3,12 +3,17 @@ let items =["Internet Cats", "Meme's", "Typing", "Space", "Rick and Morty"];
 
 // Adding searched items to HTML
 function addItems() {
-    
+    document.getElementById("search-history").innerHTML='';
     items.forEach(item => {
         var tag = document.createElement("button");
         tag.innerHTML = item;
         tag.value=item;
         document.getElementById("search-history").appendChild(tag).classList.add("btn", "btn-history");
+    })
+
+    // Adding eventlisteners on updated history
+    document.querySelectorAll(".btn").forEach( button => {
+        button.addEventListener('click', startSearch)
     })
 }
 
@@ -32,11 +37,19 @@ function startSearch() {
     // Clicked from search
     if(this.classList.contains("btn-submit")){
         var input = document.getElementById("userInput").value;
+        document.getElementById("userInput").value='';
         param = {
             q: input,
             api_key: 'LZUsjE9N2zpPI5QnY6gIBJEFpZ2opbUa',
             limit: 20
         };  
+
+        // Updating search history
+        if(input) {
+            items.push(input);
+            items.shift();
+            addItems();
+        }
         
         // Call function to send request
         getGifs(param);
@@ -57,7 +70,6 @@ function startSearch() {
 async function getGifs(param){
     const response = await fetch("https://api.giphy.com/v1/gifs/search?" + new URLSearchParams(param));
     const gifs = await response.json();
-
     display(gifs);
 }
 
@@ -68,16 +80,53 @@ async function getTrends(param) {
 }
 
 function display(gifs){
-    document.getElementById("result-gifs").innerHTML = '';
-    console.log(gifs);
+    const gifRoot=document.querySelector('#result-gifs');
+    const renderer = new GifRenderer(gifRoot);
+    renderer.gifRenderer(gifs);
 }
+
+
+class GifRenderer {
+    constructor (root) {
+        this.root =root;
+    }
+
+    gifRenderer(gifs) {
+        this.root.innerHTML='';
+        for(let gif in gifs){
+            this.root.innerHTML += this._gifToHTML(gifs[gif]);
+            console.log(gifs[gif]);
+        }
+    }
+
+    _gifToHTML(gifs){
+        let gifhtml='';
+
+        gifs.forEach(gif =>{
+            gifhtml += `
+                <div class="gif">
+                <img src="${gif.url}" alt="">
+                <h3>${gif.title}</h3>
+                </div>
+            `;
+        })
+        return `<div id="result-gifs">${gifhtml}</div>`;
+    }
+
+}
+
 
 function main() {
     addItems();
-    document.querySelectorAll(".btn").forEach( button => {
-        button.addEventListener('click', startSearch)
-    })
 
+    // Enabling submiting via enter key
+    var input = document.getElementById("userInput");
+    input.addEventListener("keyup", function(event) {
+        if (event.keyCode === 13) {
+            event.preventDefault();
+            document.getElementById("submit").click();
+        }
+    });
 }
 
 window.addEventListener('load',main);
