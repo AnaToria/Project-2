@@ -19,7 +19,7 @@ function addItems() {
 
 function startSearch() {
     var param;
-    
+    var input = document.getElementById("userInput").value;
     // Checking which button is clicked 
 
     // Clicked from search history
@@ -35,8 +35,7 @@ function startSearch() {
     }
 
     // Clicked from search
-    if(this.classList.contains("btn-submit")){
-        var input = document.getElementById("userInput").value;
+    if(this.classList.contains("btn-submit") && input !== ''){
         document.getElementById("userInput").value='';
         param = {
             q: input,
@@ -45,11 +44,11 @@ function startSearch() {
         };  
 
         // Updating search history
-        if(input) {
+
             items.push(input);
             items.shift();
             addItems();
-        }
+        
         
         // Call function to send request
         getGifs(param);
@@ -70,13 +69,13 @@ function startSearch() {
 async function getGifs(param){
     const response = await fetch("https://api.giphy.com/v1/gifs/search?" + new URLSearchParams(param));
     const gifs = await response.json();
-    display(gifs);
+    display(gifs.data);
 }
 
 async function getTrends(param) {
     const response = await fetch("https://api.giphy.com/v1/gifs/trending?" + new URLSearchParams(param));
     const gifs = await response.json();
-    display(gifs);
+    display(gifs.data);
 }
 
 function display(gifs){
@@ -88,28 +87,27 @@ function display(gifs){
 
 class GifRenderer {
     constructor (root) {
-        this.root =root;
+        this.root = root;
     }
 
     gifRenderer(gifs) {
         this.root.innerHTML='';
-        for(let gif in gifs){
-            this.root.innerHTML += this._gifToHTML(gifs[gif]);
-            console.log(gifs[gif]);
+        if(gifs){
+            for (let index = 0; index < 20; index++) {
+                this.root.innerHTML += this._gifToHTML(gifs[index]);
+            }
         }
     }
 
-    _gifToHTML(gifs){
-        let gifhtml='';
-
-        gifs.forEach(gif =>{
+    _gifToHTML(gif){
+        let gifhtml='';        
             gifhtml += `
                 <div class="gif">
                 <img src="${gif.url}" alt="">
                 <h3>${gif.title}</h3>
                 </div>
             `;
-        })
+       
         return `<div id="result-gifs">${gifhtml}</div>`;
     }
 
