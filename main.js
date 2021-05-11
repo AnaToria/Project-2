@@ -94,7 +94,7 @@ class GifRenderer {
         this.root.innerHTML='';
         if(gifs){
             for (let index = 0; index < 20; index++) {
-                this.root.innerHTML += this._gifToHTML(gifs[index]);
+                this.root.innerHTML += this._gifToHTML(gifs[index]);            
             }
         }
     }
@@ -103,7 +103,7 @@ class GifRenderer {
         let gifhtml='';        
             gifhtml += `
                 <div class="gif">
-                <img src="${gif.url}" alt="">
+                <img src="${gif.images.downsized.url}" alt="">
                 <h3>${gif.title}</h3>
                 </div>
             `;
